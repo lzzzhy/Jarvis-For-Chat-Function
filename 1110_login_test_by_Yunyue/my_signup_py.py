@@ -1,7 +1,9 @@
-from MySignupUI import SignupUI
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+# coding=utf-8
+"""
+
+"""
+
+
 import sys
 import sqlite3
 import random
@@ -10,13 +12,16 @@ import urllib
 import hashlib
 import datetime
 import re
-import time
-import json
-import ssl
+from PyQt5 import QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from my_signup_ui import SignupUI
 
 
-# 继承界面
 class SignupLogic(SignupUI):
+    """
+
+    """
     def __init__(self):
         super(SignupLogic, self).__init__()
         self.conn = sqlite3.connect("jarvis.sqlite3")
@@ -34,6 +39,7 @@ class SignupLogic(SignupUI):
 
 
         # 此处改变密码输入框lineEdit_password的属性，使其不显示密码
+        # 且通过正则限制输入的字符长度最多为15位
         self.LEpassword.setEchoMode(QtWidgets.QLineEdit.Password)
         self.LErepassword.setEchoMode(QtWidgets.QLineEdit.Password)
         self.LEpassword.setPlaceholderText("密码不超过15位")
@@ -52,7 +58,7 @@ class SignupLogic(SignupUI):
         """
         哈希md5加密方法
         :param src: 字符串str
-        :return:
+        :return:加密后的32位md5码
         """
         src = (src + "请使用私钥加密").encode("utf-8")
         m = hashlib.md5()
@@ -71,7 +77,6 @@ class SignupLogic(SignupUI):
         user_password = self.LEpassword.text()
         user_repassword = self.LErepassword.text()
         user_vcode=self.LEsendvcode.text()
-
 
         if user_name == "" or user_phone == ""or user_password == ""or user_repassword == ""or user_vcode == "":
             self.LBtips.setText("请将下列信息填写完整")
@@ -95,32 +100,39 @@ class SignupLogic(SignupUI):
                 self.LBtips.setText("用户名重复")
 
 
-    # 生成验证码
     def creat_vcode(self):
-        # 生产验证码
+        """
+        生成验证码
+        调用send_industry_sms()发送信息
+        :return:
+        """
         chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         x = random.choice(chars), random.choice(chars), random.choice(chars), random.choice(chars), random.choice(
             chars), random.choice(chars)
         self.verifycode = "".join(x)
-        # tos是用户的手机号
+        # 获取用户的手机号
         tos = self.LEphone.text()
-        # 短信内容
+        # 构造短信内容，需事先在秒嘀科技审核通过该短信模板
         smsContent = '【Jarvis for Chat】登录验证码：' + self.verifycode + '，如非本人操作，请忽略此短信。'
         # 验证手机号正确性
         ret = re.match(r"^1[35678]\d{9}$", tos)
         if tos == "":
             self.LBtips.setText("请填写手机号")
         elif ret:
-            self.sendIndustrySms(tos,smsContent)
+            self.send_industry_sms(tos,smsContent)
         else:
             self.LBtips.setText("请填写符合规范的手机号")
 
 
-    # 发送验证码短信
-    def sendIndustrySms(self,tos, smsContent):
-        # 定义账号和密码，开户之后可以从用户中心得到这两个值
-        accountSid = '6ac4f4828fef413ebaf90e5bf9bff782'
-        acctKey = '46cc515148fa4bf29fb571ed27b8fa63'
+    def send_industry_sms(self,tos, smsContent):
+        """
+        发送信息
+        使用秒嘀科技API实现
+        :return:
+        """
+        # 秒嘀科技注册后的账户信息
+        accountSid = '6ac4f4828fef413ebaf90e5bf9bff782'          # ACCOUNT SID
+        acctKey = '46cc515148fa4bf29fb571ed27b8fa63'          # AUTH TOKEN
 
         # 定义地址，端口等
         serverHost = "api.miaodiyun.com"
@@ -155,12 +167,11 @@ class SignupLogic(SignupUI):
         # 读取返回数据
         jsondata = response.read().decode('utf-8')
 
-        # 打印完整的返回数据
-        print(jsondata)
+        # 打印完整的返回数据，测试使用 #
+        # print(jsondata)
 
         # 关闭连接
         conn.close()
-
 
 
 if __name__ == '__main__':

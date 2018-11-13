@@ -1,28 +1,29 @@
 # coding=utf-8
 """
-继承自登录的基础界面
-实现具体的数据库操作
+继承自登录的基础界面——my_login_ui.py
+使用sqlite和数据库jarvis.sqlite3交互
 """
 
-from MyloginUI import LoginUi
-from PyQt5 import QtWidgets
+
 import sys
 import sqlite3
 import hashlib
 import time
+from PyQt5 import QtWidgets
+from my_login_ui import LoginUi
 
 
-# 继承界面
 class LoginLogic(LoginUi):
+    '''
+
+    '''
+
     def __init__(self):
         super(LoginLogic, self).__init__()
-        self.conn = sqlite3.connect("jarvis.sqlite3")  # 使用其他数据库的话此处和import模块需要修改
-
+        self.conn = sqlite3.connect("jarvis.sqlite3")
         # 此处改变密码输入框LEpassword的属性，使其不现实密码
         self.LEpassword.setEchoMode(QtWidgets.QLineEdit.Password)
-
         # qt的信号槽机制，连接按钮的点击事件和相应的方法
-
         self.PBsignin.clicked.connect(lambda: self.sign_in())
 
     @staticmethod
@@ -30,7 +31,7 @@ class LoginLogic(LoginUi):
         """
         哈希md5加密方法
         :param src: 字符串str
-        :return:
+        :return:加密后的32位md5码
         """
         src = (src + "请使用私钥加密").encode("utf-8")
         m = hashlib.md5()
@@ -60,7 +61,6 @@ class LoginLogic(LoginUi):
                     self.close()
                 else:
                     self.LBtips.setText("密码不正确")
-
 
     def open_main_window(self):
         """

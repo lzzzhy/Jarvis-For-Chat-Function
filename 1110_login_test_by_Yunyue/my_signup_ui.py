@@ -1,16 +1,20 @@
 # coding=utf-8
 """
-我先试着写一个注册的基础界面
-注册的时候用“用户名”、“手机”和“密码”
-有“确认密码”
-暂时没有验证码
+注册的基础界面
+
 """
 
-from PyQt5 import QtWidgets
+
 import sys
+from PyQt5 import QtWidgets
 
 
 class SignupUI(QtWidgets.QDialog):
+    """
+        这个类用来实现基础的注册界面展示
+        没有交互功能
+        包括“用户名”、“密码”、“确认密码”、“手机号”、“验证码”、“提示标签”
+    """
     def __init__(self):
         super(SignupUI, self).__init__()
         self.LBtips=QtWidgets.QLabel() # 提示文本/标签
@@ -27,7 +31,6 @@ class SignupUI(QtWidgets.QDialog):
 
         self.PBsendvcode = QtWidgets.QPushButton()  # 发送验证码/按钮
         self.PBsignup = QtWidgets.QPushButton() # 注册/按钮
-
 
         self.HLtips=QtWidgets.QHBoxLayout()
         self.HLuser = QtWidgets.QHBoxLayout()

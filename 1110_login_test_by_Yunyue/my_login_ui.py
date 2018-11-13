@@ -1,14 +1,19 @@
 # coding=utf-8
 """
-我先试着写一个登录的基础界面
-登录的时候用“用户名”和“密码”登录就好了
+登录的基础UI界面
 """
 
-from PyQt5 import QtWidgets
+
 import sys
+from PyQt5 import QtWidgets
 
 
 class LoginUi(QtWidgets.QDialog):
+    """
+    这个类用来实现基础的登录界面展示
+    没有交互功能
+    包括“用户名”、“密码”、“登录按钮”、“提示标签”
+    """
     def __init__(self):
         super(LoginUi, self).__init__()
         self.LBtips=QtWidgets.QLabel() # 提示文本

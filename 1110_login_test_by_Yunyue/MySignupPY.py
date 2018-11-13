@@ -4,8 +4,15 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 import sqlite3
+import random
+import http.client
+import urllib
 import hashlib
+import datetime
+import re
 import time
+import json
+import ssl
 
 
 # 继承界面
@@ -37,6 +44,8 @@ class SignupLogic(SignupUI):
 
         # qt的信号槽机制，连接按钮的点击事件和相应的方法
         self.PBsignup.clicked.connect(lambda: self.sign_up())
+        self.PBsendvcode.clicked.connect(lambda : self.creat_vcode())
+
 
     @staticmethod
     def hash(src):
@@ -61,11 +70,17 @@ class SignupLogic(SignupUI):
         user_phone=self.LEphone.text()
         user_password = self.LEpassword.text()
         user_repassword = self.LErepassword.text()
-        if user_name == "" or user_phone == ""or user_password == ""or user_repassword == "":
+        user_vcode=self.LEsendvcode.text()
+
+
+        if user_name == "" or user_phone == ""or user_password == ""or user_repassword == ""or user_vcode == "":
             self.LBtips.setText("请将下列信息填写完整")
         elif user_password != user_repassword:
             self.LBtips.setText("密码不一致")
             self.LErepassword.setText("")
+        elif user_vcode != self.verifycode:
+            self.LBtips.setText("验证码错误，请重新输入")
+            self.LEsendvcode.setText("")
         else:
             user_password = self.hash(user_password)
             c_sqlite.execute("""select * from user where name = ?""", (user_name,))
@@ -78,6 +93,73 @@ class SignupLogic(SignupUI):
                 self.conn.commit()
             else:
                 self.LBtips.setText("用户名重复")
+
+
+    # 生成验证码
+    def creat_vcode(self):
+        # 生产验证码
+        chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        x = random.choice(chars), random.choice(chars), random.choice(chars), random.choice(chars), random.choice(
+            chars), random.choice(chars)
+        self.verifycode = "".join(x)
+        # tos是用户的手机号
+        tos = self.LEphone.text()
+        # 短信内容
+        smsContent = '【Jarvis for Chat】登录验证码：' + self.verifycode + '，如非本人操作，请忽略此短信。'
+        # 验证手机号正确性
+        ret = re.match(r"^1[35678]\d{9}$", tos)
+        if tos == "":
+            self.LBtips.setText("请填写手机号")
+        elif ret:
+            self.sendIndustrySms(tos,smsContent)
+        else:
+            self.LBtips.setText("请填写符合规范的手机号")
+
+
+    # 发送验证码短信
+    def sendIndustrySms(self,tos, smsContent):
+        # 定义账号和密码，开户之后可以从用户中心得到这两个值
+        accountSid = '6ac4f4828fef413ebaf90e5bf9bff782'
+        acctKey = '46cc515148fa4bf29fb571ed27b8fa63'
+
+        # 定义地址，端口等
+        serverHost = "api.miaodiyun.com"
+        serverPort = 443
+        industryUrl = "/20150822/industrySMS/sendSMS"
+
+        # 格式化时间戳，并计算签名
+        timeStamp = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d%H%M%S')
+        rawsig = accountSid + acctKey + timeStamp
+        m = hashlib.md5()
+        m.update(rawsig.encode("utf8"))
+        sig = m.hexdigest()
+
+        # 定义需要进行发送的数据表单
+        params = urllib.parse.urlencode(
+            {'accountSid': accountSid,
+             'smsContent': smsContent,
+             'to': tos,
+             'timestamp': timeStamp,
+             'sig': sig
+             }
+        )
+
+        # 定义header
+        headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
+        # 与构建https连接
+        conn = http.client.HTTPSConnection(serverHost, serverPort)
+        # Post数据
+        conn.request(method="POST", url=industryUrl, body=params, headers=headers)
+        # 返回处理后的数据
+        response = conn.getresponse()
+        # 读取返回数据
+        jsondata = response.read().decode('utf-8')
+
+        # 打印完整的返回数据
+        print(jsondata)
+
+        # 关闭连接
+        conn.close()
 
 
 

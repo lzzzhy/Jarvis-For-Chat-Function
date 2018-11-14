@@ -8,23 +8,36 @@ MESSAGE_SAVE_DIR = "qqbot_message"
 
 def get_current_time():
     '''
-    返回当前时间的字符串
+    以字符串形式返回当前时间
     '''
     return str(time.strftime("%Y%m%d%H%M%S", time.localtime(time.time())))
 
 
 def send_short_message(phonenumber, content):
+    '''
+    发送短信 待补充
+    :param phonenumber: 手机号码
+    :param content: 要发送的信息
+    :return: 发送成功返回True 否则返回False
+    '''
     print("向{}发送{}".format(phonenumber, content))
 
 def save_qq_buddy_message(user_id, buddy, content):
+    '''
+    保存QQ好友的消息
+    :param user_id:
+    :param buddy:
+    :param content:
+    :return:
+    '''
     save_dir = os.path.join(MESSAGE_SAVE_DIR, user_id)
-    print("{}  {}".format(os.getcwd(), save_dir))
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
+
     json_path = os.path.join(save_dir, 'buddy.json')
 
     if os.path.exists(json_path):
-        print("[ ]读取中")
+        print("[ ]读取messages.json中")
         with open(json_path, encoding='utf-8') as json_f:
             messages = json.load(json_f)
 
@@ -33,18 +46,61 @@ def save_qq_buddy_message(user_id, buddy, content):
         with open(json_path, "w", encoding='utf-8') as json_f:
             json.dump(messages, json_f, indent=4, separators=(',', ': '), ensure_ascii=False)
 
-        print("[+]写入成功")
+        print("[+]messages.json写入成功")
     else:
         messages = [[buddy.nick, get_current_time(), content]]
 
         with open(json_path, "w", encoding='utf-8') as json_f:
             json.dump(messages, json_f, indent=4, separators=(',', ': '), ensure_ascii=False)
 
-        print("[+]写入成功")
+        print("[+]messages.json写入成功")
 
 
 def save_qq_group_message(user_id, group, member, content):
-    pass
+    '''
+    保存QQ群消息
+    :param user_id:
+    :param group:
+    :param member:
+    :param content:
+    :return:
+    '''
+    save_dir = os.path.join(MESSAGE_SAVE_DIR, user_id)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # print(member.__dict__)
+
+    group_name = group.nick
+    json_path = os.path.join(save_dir, group_name+'.json')
+
+    # 优先保存群备注
+    member_name = member.card
+    if len(member_name) == 0:
+        # 群备注为空时以网名保存
+        member_name = member.name
+
+
+    if os.path.exists(json_path):
+        print("[ ]读取群\"{}\"的文件中".format(group_name))
+        with open(json_path, encoding='utf-8') as json_f:
+            messages = json.load(json_f)
+
+        messages.append([group.nick, member_name, get_current_time(), content])
+
+        with open(json_path, "w", encoding='utf-8') as json_f:
+            json.dump(messages, json_f, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+        print("[ ]群\"{}\"文件写入成功".format(group_name))
+
+    else:
+        messages = [[group.nick, member_name, get_current_time(), content]]
+
+        with open(json_path, "w", encoding='utf-8') as json_f:
+            json.dump(messages, json_f, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+        print("[ ]群\"{}\"文件写入成功".format(group_name))
+
 
 def onQQMessage(bot, contact, member, content):
     '''
@@ -72,6 +128,10 @@ def onQQMessage(bot, contact, member, content):
 
     # 如果是自己发的信息 忽略
     if bot.isMe(contact, member):
+        return
+
+    # 如果消息长度为0(一般是图片以及文件等无法获取的消息)时忽略
+    if len(content) == 0:
         return
 
     # 当有人@时

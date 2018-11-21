@@ -47,7 +47,7 @@ def IsExistUser(userID):
     con.close()
     return r[0][0]
 
-def Insert_User(userID,nickname,tel,password)
+def Insert_User(userID,nickname,tel,password):
     '''
     注册用户信息添加到用户表
     :param userID: 用户名
@@ -62,7 +62,7 @@ def Insert_User(userID,nickname,tel,password)
     sg = True
     try:
         c.execute("insert into user (userID,nickname,tel,password) \
-         values (?,?,?,?)", ('test1', 'tess', '133333', 'ddddd'))
+         values (?,?,?,?)", (userID, nickname, tel, password))
         con.commit()
         con.close()
     except Exception:
@@ -71,4 +71,3 @@ def Insert_User(userID,nickname,tel,password)
         con.close()
     finally:
         return sg
-    return sg

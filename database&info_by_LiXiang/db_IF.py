@@ -32,7 +32,7 @@ def IsExistUser(userID):
     """
     验证登录用户是否存在
     :param userID: 用户名 str
-    :return: 密码 str
+    :return: 加密密码 str
     """
     import sqlite3
     con = sqlite3.connect('Jarvis-forChat.db')
@@ -43,7 +43,7 @@ def IsExistUser(userID):
         '''for i in range(len(r)):
             print(r[i])'''
     else:
-        print("用户不存在！")
+        return None
     con.close()
     return r[0][0]
 
@@ -53,7 +53,7 @@ def Insert_User(userID,nickname,tel,password):
     :param userID: 用户名
     :param nickname: 昵称
     :param tel: 手机号
-    :param password: 未加密密码
+    :param password: 加密密码
     :return: 成功返回true
     '''
     import sqlite3
@@ -71,3 +71,4 @@ def Insert_User(userID,nickname,tel,password):
         con.close()
     finally:
         return sg
+    return sg

@@ -1,69 +1,84 @@
 # coding=utf-8
-"""
-
-"""
-
-
 import sys
-import sqlite3
 import random
 import http.client
 import urllib
 import hashlib
 import datetime
 import re
-from PyQt5 import QtWidgets
+import db_IF
+from PyQt5 import QtWidgets,QtGui,QtCore
+from PyQt5.QtWidgets import QDialog
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from my_signup_ui import SignupUI
+from Signup import Ui_Dialog
+from my_login_py import LoginLogic
 
 
-class SignupLogic(SignupUI):
-    """
-
-    """
-    def __init__(self):
-        super(SignupLogic, self).__init__()
-        self.conn = sqlite3.connect("jarvis.sqlite3")
-        try:
-            create_tb_cmd = '''
-                CREATE TABLE IF NOT EXISTS USER
-                (NAME varchar(14) PRIMARY KEY,
-                PHONE varchar(11) NOT NULL,
-                PASSWORD char(32) NOT NULL
-                );
-                '''
-            self.conn.execute(create_tb_cmd)
-        except :
-            print("Create table failed")
+# class Login(LoginLogic):
+#     def __init__(self):
+#         super().__init__()
+#         self.setupUi(self)
+#         self.retranslateUi(self)
 
 
+class SignupLogic(QDialog,Ui_Dialog):
+    def __init__(self,parent=None):
+        super(SignupLogic, self).__init__(parent)
+
+        """初始化"""
+        self.setupUi(self)
+        self.retranslateUi(self)
+
+        """窗口初始化"""
+        # self.setWindowOpacity(0.9)  # 设置窗口透明度
+        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+
+        """输入框初始化"""
+        # 此处改变密码输入框LEpassword的属性，使其不现实密码
+        self.LE_password.setEchoMode(QtWidgets.QLineEdit.Password)
+
+        """logo初始化"""
+        PNG_logo = QtGui.QPixmap('./images/LOGO1.png')
+        self.LB_logo.setPixmap(PNG_logo)
+        self.LB_logo.setScaledContents(True)
+
+        """输入栏icon初始化"""
+        PNG_username = QtGui.QPixmap('./images/password1.png')
+        PNG_password = QtGui.QPixmap('./images/password1.png')
+        PNG_phone = QtGui.QPixmap('./images/phone1.png')
+        self.LBP_username.setPixmap(PNG_username)
+        self.LBP_username.setScaledContents(True)
+        self.LBP_phone.setPixmap(PNG_phone)
+        self.LBP_phone.setScaledContents(True)
+        self.LBP_password.setPixmap(PNG_password)
+        self.LBP_password.setScaledContents(True)
+        self.LBP_rpassword.setPixmap(PNG_password)
+        self.LBP_rpassword.setScaledContents(True)
+
+        """初始化输入框"""
+        self.LE_username.setPlaceholderText("请输入昵称")
+        self.LE_rpassword.setPlaceholderText("请再次输入密码")
+
+        """初始化密码输入框"""
         # 此处改变密码输入框lineEdit_password的属性，使其不显示密码
         # 且通过正则限制输入的字符长度最多为15位
-        self.LEpassword.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.LErepassword.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.LEpassword.setPlaceholderText("密码不超过15位")
-        self.LErepassword.setPlaceholderText("请再次输入密码")
+        self.LE_password.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.LE_rpassword.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.LE_password.setPlaceholderText("密码不超过15位")
+        self.LE_rpassword.setPlaceholderText("请再次输入密码")
         regx = QRegExp("^[\S|\s]{15}$")
-        self.LEpassword.setValidator(QRegExpValidator(regx, self.LEpassword))
-        self.LErepassword.setValidator(QRegExpValidator(regx, self.LErepassword))
+        self.LE_password.setValidator(QRegExpValidator(regx, self.LE_password))
+        self.LE_rpassword.setValidator(QRegExpValidator(regx, self.LE_rpassword))
 
+        """初始化信号槽"""
         # qt的信号槽机制，连接按钮的点击事件和相应的方法
-        self.PBsignup.clicked.connect(lambda: self.sign_up())
-        self.PBsendvcode.clicked.connect(lambda : self.creat_vcode())
-
-
-    @staticmethod
-    def hash(src):
-        """
-        哈希md5加密方法
-        :param src: 字符串str
-        :return:加密后的32位md5码
-        """
-        src = (src + "请使用私钥加密").encode("utf-8")
-        m = hashlib.md5()
-        m.update(src)
-        return m.hexdigest()
+        self.PB_signup.clicked.connect(lambda: self.sign_up())
+        self.PB_vcode.clicked.connect(lambda : self.creat_vcode())
+        # 关闭按钮关闭当前对话框
+        self.PB_close.clicked.connect(self.close)
+        self.PB_return.clicked.connect(lambda: self.return_main())
 
 
     def sign_up(self):
@@ -71,33 +86,28 @@ class SignupLogic(SignupUI):
         注册方法
         :return:
         """
-        c_sqlite = self.conn.cursor()
-        user_name = self.LEuser.text()
-        user_phone=self.LEphone.text()
-        user_password = self.LEpassword.text()
-        user_repassword = self.LErepassword.text()
-        user_vcode=self.LEsendvcode.text()
+        user_name = self.LE_username.text()
+        user_phone=self.LE_phone.text()
+        user_password = self.LE_password.text()
+        user_repassword = self.LE_rpassword.text()
+        user_vcode=self.LE_vcode.text()
 
         if user_name == "" or user_phone == ""or user_password == ""or user_repassword == ""or user_vcode == "":
-            self.LBtips.setText("请将下列信息填写完整")
+            self.LB_note.setText("请将以上信息填写完整")
         elif user_password != user_repassword:
-            self.LBtips.setText("密码不一致")
-            self.LErepassword.setText("")
+            self.LB_note.setText("密码不一致")
+            self.LE_rpassword.setText("")
         elif user_vcode != self.verifycode:
-            self.LBtips.setText("验证码错误，请重新输入")
-            self.LEsendvcode.setText("")
+            self.LB_note.setText("验证码错误，请重新输入")
+            self.LE_vcode.setText("")
         else:
-            user_password = self.hash(user_password)
-            c_sqlite.execute("""select * from user where name = ?""", (user_name,))
-            if not c_sqlite.fetchone():
-                try:
-                    c_sqlite.execute("""INSERT INTO USER VALUES (?,?,?)""", (user_name ,user_phone,user_password))
-                except:
-                    print("error")
-                self.LBtips.setText("注册成功")
-                self.conn.commit()
+            user_password = db_IF.hash(user_password)
+            if not db_IF.IsExistUser(user_name):
+                now_time=datetime.datetime.now()
+                db_IF.Insert_User(now_time,user_name,user_phone,user_password)
+                self.LB_note.setText("注册成功")
             else:
-                self.LBtips.setText("用户名重复")
+                self.LB_note.setText("用户名重复")
 
 
     def creat_vcode(self):
@@ -111,17 +121,17 @@ class SignupLogic(SignupUI):
             chars), random.choice(chars)
         self.verifycode = "".join(x)
         # 获取用户的手机号
-        tos = self.LEphone.text()
+        tos = self.LE_phone.text()
         # 构造短信内容，需事先在秒嘀科技审核通过该短信模板
         smsContent = '【Jarvis for Chat】登录验证码：' + self.verifycode + '，如非本人操作，请忽略此短信。'
         # 验证手机号正确性
         ret = re.match(r"^1[35678]\d{9}$", tos)
         if tos == "":
-            self.LBtips.setText("请填写手机号")
+            self.LB_note.setText("请填写手机号")
         elif ret:
             self.send_industry_sms(tos,smsContent)
         else:
-            self.LBtips.setText("请填写符合规范的手机号")
+            self.LB_note.setText("请填写符合规范的手机号")
 
 
     def send_industry_sms(self,tos, smsContent):
@@ -170,12 +180,22 @@ class SignupLogic(SignupUI):
         # 打印完整的返回数据，测试使用 #
         # print(jsondata)
 
-        # 关闭连接
-        conn.close()
+    def return_main(self):
+        """
+        返回登录的界面
+        :return:
+        """
+        Log =LoginLogic()
+        Log.show()
+        self.close()
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     ui = SignupLogic()
+    """qss初始化"""
+    f = open(r'E:/Users/lenovo/PycharmProjects/Jarvis/style_syy.qss', "r", encoding='utf-8')
+    style = f.read()
+    app.setStyleSheet(style)
     ui.show()
     sys.exit(app.exec_())

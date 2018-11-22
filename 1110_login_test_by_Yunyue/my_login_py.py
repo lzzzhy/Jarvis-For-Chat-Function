@@ -4,77 +4,88 @@
 使用sqlite和数据库jarvis.sqlite3交互
 """
 
-
 import sys
-import sqlite3
-import hashlib
 import time
-from PyQt5 import QtWidgets
-from my_login_ui import LoginUi
+from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtWidgets import QDialog, QLabel,QApplication
+from PyQt5.QtCore import *
+from Login import Ui_Dialog
+import db_IF as DB
 
 
-class LoginLogic(LoginUi):
-    '''
+# class Signup(SignupLogic):
+#     def __init__(self):
+#         super().__init__()
+#         self.setupUi(self)
+#         self.retranslateUi(self)
 
-    '''
+class LoginLogic(QDialog, Ui_Dialog):
+    def __init__(self, parent=None):
+        super(LoginLogic, self).__init__(parent)
 
-    def __init__(self):
-        super(LoginLogic, self).__init__()
-        self.conn = sqlite3.connect("jarvis.sqlite3")
+        """初始化函数"""
+        self.setupUi(self)
+        self.retranslateUi(self)
+
+        """窗口初始化"""
+        self.setWindowOpacity(0.9)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
+
+        """输入框初始化"""
         # 此处改变密码输入框LEpassword的属性，使其不现实密码
-        self.LEpassword.setEchoMode(QtWidgets.QLineEdit.Password)
-        # qt的信号槽机制，连接按钮的点击事件和相应的方法
-        self.PBsignin.clicked.connect(lambda: self.sign_in())
+        self.LE_password.setEchoMode(QtWidgets.QLineEdit.Password)
 
-    @staticmethod
-    def hash(src):
-        """
-        哈希md5加密方法
-        :param src: 字符串str
-        :return:加密后的32位md5码
-        """
-        src = (src + "请使用私钥加密").encode("utf-8")
-        m = hashlib.md5()
-        m.update(src)
-        return m.hexdigest()
+        """logo初始化"""
+        PNG_logo = QtGui.QPixmap('./images/LOGO1.png')
+        self.LB_logo.setPixmap(PNG_logo)
+        self.LB_logo.setScaledContents(True)
+
+        """输入栏icon初始化"""
+        PNG_username = QtGui.QPixmap('./images/user.png')
+        PNG_password = QtGui.QPixmap('./images/password1.png')
+        self.LBP_username.setPixmap(PNG_username)
+        self.LBP_username.setScaledContents(True)
+        self.LBP_password.setPixmap(PNG_password)
+        self.LBP_password.setScaledContents(True)
+
+        """信号槽初始化"""
+        # qt的信号槽机制，连接按钮的点击事件和相应的方法
+        self.PB_login.clicked.connect(lambda: self.sign_in())
+        # 关闭按钮关闭当前对话框
+        self.PB_close.clicked.connect(self.close)
+
 
     def sign_in(self):
         """
         登陆方法
         :return:
         """
-        c_sqlite = self.conn.cursor()
-        user_name = self.LEuser.text()
-        user_password = self.LEpassword.text()
+        user_name = self.LE_username.text()
+        user_password = self.LE_password.text()
         if user_name == "" or user_password == "":
-            self.LBtips.setText("请输入用户名和密码")
+            self.LB_note.setText("请输入用户名和密码")
         else:
-            c_sqlite.execute("""SELECT password FROM user WHERE name = ?""", (user_name,))
-            password = c_sqlite.fetchall()
+            password = DB.IsExistUser(user_name)
             if not password:
-                self.LBtips.setText("此用户未注册")
+                self.LB_note.setText("此用户未注册")
             else:
-                if self.hash(user_password) == password[0][0]:
-                    self.LBtips.setText("登陆成功")
+                if DB.hash(user_password) == password:
+                    self.LB_note.setText("登陆成功")
                     time.sleep(1)
                     self.open_main_window()
                     self.close()
                 else:
-                    self.LBtips.setText("密码不正确")
+                    self.LB_note.setText("密码不正确")
 
-    def open_main_window(self):
-        """
-        此处添加登录成功后打开的另一个窗口的程序
-        :return:
-        """
-        # 下方注释的代码根据自己的情况更改
-        # ui = Ui_Dialog()
-        # ui.show()
-        print("打开另一个窗口")
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     ui = LoginLogic()
+    """qss初始化"""
+    f = open(r'E:/Users/lenovo/PycharmProjects/Jarvis/style_syy.qss', "r", encoding='utf-8')
+    style = f.read()
+    app.setStyleSheet(style)
     ui.show()
     sys.exit(app.exec_())

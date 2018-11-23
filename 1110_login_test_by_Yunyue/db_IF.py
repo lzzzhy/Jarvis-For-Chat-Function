@@ -71,4 +71,3 @@ def Insert_User(userID,nickname,tel,password):
         con.close()
     finally:
         return sg
-    return sg

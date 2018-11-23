@@ -5,6 +5,7 @@ import http.client
 import urllib
 import hashlib
 import datetime
+import time
 import re
 import db_IF
 from PyQt5 import QtWidgets,QtGui,QtCore
@@ -12,14 +13,7 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from Signup import Ui_Dialog
-from my_login_py import LoginLogic
 
-
-# class Login(LoginLogic):
-#     def __init__(self):
-#         super().__init__()
-#         self.setupUi(self)
-#         self.retranslateUi(self)
 
 
 class SignupLogic(QDialog,Ui_Dialog):
@@ -30,22 +24,26 @@ class SignupLogic(QDialog,Ui_Dialog):
         self.setupUi(self)
         self.retranslateUi(self)
 
+        """初始化验证码"""
+        self.verifycode = ""
+
         """窗口初始化"""
-        # self.setWindowOpacity(0.9)  # 设置窗口透明度
-        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+        self.setWindowOpacity(0.95)  # 设置窗口透明度
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
 
         """输入框初始化"""
         # 此处改变密码输入框LEpassword的属性，使其不现实密码
         self.LE_password.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.LE_username.setTextMargins(40, 0, 0, 0)
 
         """logo初始化"""
         PNG_logo = QtGui.QPixmap('./images/LOGO1.png')
         self.LB_logo.setPixmap(PNG_logo)
         self.LB_logo.setScaledContents(True)
 
-        """输入栏icon初始化"""
-        PNG_username = QtGui.QPixmap('./images/password1.png')
+        """icon初始化"""
+        PNG_username = QtGui.QPixmap('./images/username1.png')
         PNG_password = QtGui.QPixmap('./images/password1.png')
         PNG_phone = QtGui.QPixmap('./images/phone1.png')
         self.LBP_username.setPixmap(PNG_username)
@@ -56,6 +54,7 @@ class SignupLogic(QDialog,Ui_Dialog):
         self.LBP_password.setScaledContents(True)
         self.LBP_rpassword.setPixmap(PNG_password)
         self.LBP_rpassword.setScaledContents(True)
+
 
         """初始化输入框"""
         self.LE_username.setPlaceholderText("请输入昵称")
@@ -79,6 +78,15 @@ class SignupLogic(QDialog,Ui_Dialog):
         # 关闭按钮关闭当前对话框
         self.PB_close.clicked.connect(self.close)
         self.PB_return.clicked.connect(lambda: self.return_main())
+        # 输入框有输入时，清空提示信息
+        self.LE_username.textChanged.connect(lambda: self.empty_note())
+        self.LE_phone.textChanged.connect(lambda: self.empty_note())
+        self.LE_password.textChanged.connect(lambda: self.empty_note())
+        self.LE_rpassword.textChanged.connect(lambda: self.empty_note())
+        self.LE_vcode.textChanged.connect(lambda: self.empty_note())
+
+    def empty_note(self):
+        self.LB_note.setText("")
 
 
     def sign_up(self):
@@ -91,6 +99,7 @@ class SignupLogic(QDialog,Ui_Dialog):
         user_password = self.LE_password.text()
         user_repassword = self.LE_rpassword.text()
         user_vcode=self.LE_vcode.text()
+
 
         if user_name == "" or user_phone == ""or user_password == ""or user_repassword == ""or user_vcode == "":
             self.LB_note.setText("请将以上信息填写完整")
@@ -106,6 +115,9 @@ class SignupLogic(QDialog,Ui_Dialog):
                 now_time=datetime.datetime.now()
                 db_IF.Insert_User(now_time,user_name,user_phone,user_password)
                 self.LB_note.setText("注册成功")
+                time.sleep(5)
+                self.return_main()
+                self.close()
             else:
                 self.LB_note.setText("用户名重复")
 
@@ -185,6 +197,7 @@ class SignupLogic(QDialog,Ui_Dialog):
         返回登录的界面
         :return:
         """
+        from my_login_py import LoginLogic
         Log =LoginLogic()
         Log.show()
         self.close()

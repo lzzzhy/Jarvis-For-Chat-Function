@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+# Form implementation generated from reading ui file 'Signup.ui'
+#
+# Created by: PyQt5 UI code generator 5.11.3
+#
+# WARNING! All changes made in this file will be lost!
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Dialog(object):
@@ -10,21 +16,21 @@ class Ui_Dialog(object):
         self.widget.setGeometry(QtCore.QRect(0, 0, 340, 500))
         self.widget.setObjectName("widget")
         self.PB_vcode = QtWidgets.QPushButton(self.widget)
-        self.PB_vcode.setGeometry(QtCore.QRect(190, 350, 115, 45))
+        self.PB_vcode.setGeometry(QtCore.QRect(195, 350, 110, 43))
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         font.setPointSize(12)
         self.PB_vcode.setFont(font)
         self.PB_vcode.setObjectName("PB_vcode")
         self.LE_username = QtWidgets.QLineEdit(self.widget)
-        self.LE_username.setGeometry(QtCore.QRect(80, 166, 225, 43))
+        self.LE_username.setGeometry(QtCore.QRect(40, 166, 265, 43))
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         font.setPointSize(12)
         self.LE_username.setFont(font)
         self.LE_username.setObjectName("LE_username")
         self.LBP_username = QtWidgets.QLabel(self.widget)
-        self.LBP_username.setGeometry(QtCore.QRect(40, 166, 40, 43))
+        self.LBP_username.setGeometry(QtCore.QRect(48, 174, 24, 27))
         self.LBP_username.setText("")
         self.LBP_username.setObjectName("LBP_username")
         self.LBP_rpassword = QtWidgets.QLabel(self.widget)
@@ -66,10 +72,6 @@ class Ui_Dialog(object):
         self.PB_close.setGeometry(QtCore.QRect(315, 0, 25, 25))
         self.PB_close.setText("")
         self.PB_close.setObjectName("PB_close")
-        self.PB_return = QtWidgets.QPushButton(self.widget)
-        self.PB_return.setGeometry(QtCore.QRect(0, 0, 25, 25))
-        self.PB_return.setText("")
-        self.PB_return.setObjectName("PB_return")
         self.LE_phone = QtWidgets.QLineEdit(self.widget)
         self.LE_phone.setGeometry(QtCore.QRect(115, 304, 190, 43))
         font = QtGui.QFont()
@@ -91,6 +93,10 @@ class Ui_Dialog(object):
         font.setPointSize(12)
         self.LE_rpassword.setFont(font)
         self.LE_rpassword.setObjectName("LE_rpassword")
+        self.PB_return = QtWidgets.QPushButton(self.widget)
+        self.PB_return.setGeometry(QtCore.QRect(0, 0, 25, 25))
+        self.PB_return.setText("")
+        self.PB_return.setObjectName("PB_return")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)

@@ -25,10 +25,10 @@
    <widget class="QPushButton" name="PB_vcode">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>195</x>
       <y>350</y>
-      <width>115</width>
-      <height>45</height>
+      <width>110</width>
+      <height>43</height>
      </rect>
     </property>
     <property name="font">
@@ -44,9 +44,9 @@
    <widget class="QLineEdit" name="LE_username">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>40</x>
       <y>166</y>
-      <width>225</width>
+      <width>265</width>
       <height>43</height>
      </rect>
     </property>
@@ -60,10 +60,10 @@
    <widget class="QLabel" name="LBP_username">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>166</y>
-      <width>40</width>
-      <height>43</height>
+      <x>48</x>
+      <y>174</y>
+      <width>24</width>
+      <height>27</height>
      </rect>
     </property>
     <property name="text">
@@ -186,19 +186,6 @@
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="PB_return">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>25</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="LE_phone">
     <property name="geometry">
      <rect>
@@ -245,6 +232,19 @@
       <family>微软雅黑</family>
       <pointsize>12</pointsize>
      </font>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PB_return">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>25</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

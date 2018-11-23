@@ -43,6 +43,7 @@ def IsExistUser(userID):
         '''for i in range(len(r)):
             print(r[i])'''
     else:
+        '''print("not exit!")'''
         return None
     con.close()
     return r[0][0]

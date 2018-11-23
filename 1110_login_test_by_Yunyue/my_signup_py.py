@@ -25,7 +25,7 @@ class SignupLogic(QDialog,Ui_Dialog):
         self.retranslateUi(self)
 
         """初始化验证码"""
-        self.verifycode = ""
+        self.verifycode = "1"
 
         """窗口初始化"""
         self.setWindowOpacity(0.95)  # 设置窗口透明度
@@ -111,11 +111,10 @@ class SignupLogic(QDialog,Ui_Dialog):
             self.LE_vcode.setText("")
         else:
             user_password = db_IF.hash(user_password)
-            if not db_IF.IsExistUser(user_name):
-                now_time=datetime.datetime.now()
-                db_IF.Insert_User(now_time,user_name,user_phone,user_password)
+            if db_IF.IsExistUser(user_name) == None:
+                db_IF.Insert_User(user_name,user_name,user_phone,user_password)
                 self.LB_note.setText("注册成功")
-                time.sleep(5)
+                time.sleep(3)
                 self.return_main()
                 self.close()
             else:
@@ -207,7 +206,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     ui = SignupLogic()
     """qss初始化"""
-    f = open(r'E:/Users/lenovo/PycharmProjects/Jarvis/style_syy.qss', "r", encoding='utf-8')
+    f = open(r'./style_syy.qss', "r", encoding='utf-8')
     style = f.read()
     app.setStyleSheet(style)
     ui.show()

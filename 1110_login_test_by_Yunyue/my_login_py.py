@@ -10,7 +10,8 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QDialog, QLabel, QApplication
 from PyQt5.QtCore import *
 from Login import Ui_Dialog
-import db_IF as DB
+import db_IF
+
 
 class LoginLogic(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
@@ -51,9 +52,9 @@ class LoginLogic(QDialog, Ui_Dialog):
         self.PB_login.clicked.connect(lambda: self.sign_in())
         # 关闭按钮关闭当前对话框
         self.PB_close.clicked.connect(self.close)
-        self.PB_tosignup.clicked.connect(lambda :self.signup())
+        self.PB_tosignup.clicked.connect(lambda: self.signup())
         # 输入框有输入时，清空提示信息
-        self.LE_username.textChanged.connect(lambda : self.empty_note())
+        self.LE_username.textChanged.connect(lambda: self.empty_note())
         self.LE_password.textChanged.connect(lambda: self.empty_note())
 
     def empty_note(self):
@@ -69,17 +70,14 @@ class LoginLogic(QDialog, Ui_Dialog):
         if user_name == "" or user_password == "":
             self.LB_note.setText("请输入用户名和密码")
         else:
-            password = DB.IsExistUser(user_name)
-            if not password:
-                self.LB_note.setText("此用户未注册")
-            else:
-                if DB.hash(user_password) == password:
-                    self.LB_note.setText("登陆成功")
-                    time.sleep(1)
-                    self.open_main_window()
-                    self.close()
+            password = db_IF.IsExistUser(user_name)
+            if password != None:
+                if db_IF.hash(user_password) == password:
+                    self.LB_note.setText("登录成功")
                 else:
                     self.LB_note.setText("密码不正确")
+            else:
+                self.LB_note.setText("此用户未注册")
 
     def signup(self):
         """

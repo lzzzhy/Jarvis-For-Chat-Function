@@ -54,7 +54,7 @@ class Ui_Dialog(object):
         self.LBP_username.setText("")
         self.LBP_username.setObjectName("LBP_username")
         self.LB_note = QtWidgets.QLabel(self.widget)
-        self.LB_note.setGeometry(QtCore.QRect(40, 285, 190, 15))
+        self.LB_note.setGeometry(QtCore.QRect(120, 285, 161, 16))
         font = QtGui.QFont()
         font.setFamily("微软雅黑")
         self.LB_note.setFont(font)

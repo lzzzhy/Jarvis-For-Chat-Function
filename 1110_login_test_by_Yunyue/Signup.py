@@ -49,7 +49,7 @@ class Ui_Dialog(object):
         self.LBP_phone.setText("")
         self.LBP_phone.setObjectName("LBP_phone")
         self.LB_note = QtWidgets.QLabel(self.widget)
-        self.LB_note.setGeometry(QtCore.QRect(40, 402, 190, 15))
+        self.LB_note.setGeometry(QtCore.QRect(110, 402, 200, 15))
         self.LB_note.setText("")
         self.LB_note.setObjectName("LB_note")
         self.LBP_password = QtWidgets.QLabel(self.widget)

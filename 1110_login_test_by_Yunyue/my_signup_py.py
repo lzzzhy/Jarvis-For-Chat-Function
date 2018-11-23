@@ -24,8 +24,10 @@ class SignupLogic(QDialog,Ui_Dialog):
         self.setupUi(self)
         self.retranslateUi(self)
 
-        """初始化验证码"""
-        self.verifycode = ""
+        """初始化变量"""
+        self.verifycode = "1"
+        self.timer = QtCore.QTimer(self) #计时器
+        self.timer1 = QtCore.QTimer(self)
 
         """窗口初始化"""
         self.setWindowOpacity(0.95)  # 设置窗口透明度
@@ -111,13 +113,11 @@ class SignupLogic(QDialog,Ui_Dialog):
             self.LE_vcode.setText("")
         else:
             user_password = db_IF.hash(user_password)
-            if not db_IF.IsExistUser(user_name):
-                now_time=datetime.datetime.now()
-                db_IF.Insert_User(now_time,user_name,user_phone,user_password)
+            if db_IF.IsExistUser(user_name) == None:
+                db_IF.Insert_User(user_name,user_name,user_phone,user_password)
                 self.LB_note.setText("注册成功")
-                time.sleep(5)
-                self.return_main()
-                self.close()
+                self.timer.timeout.connect(self.return_main)
+                self.timer.start(3000)
             else:
                 self.LB_note.setText("用户名重复")
 
@@ -135,15 +135,29 @@ class SignupLogic(QDialog,Ui_Dialog):
         # 获取用户的手机号
         tos = self.LE_phone.text()
         # 构造短信内容，需事先在秒嘀科技审核通过该短信模板
-        smsContent = '【Jarvis for Chat】登录验证码：' + self.verifycode + '，如非本人操作，请忽略此短信。'
+        smsContent = '【第三视角】您的验证码为' + self.verifycode + '，请于'+ '5' + '分钟内正确输入，如非本人操作，请忽略此短信。'
         # 验证手机号正确性
         ret = re.match(r"^1[35678]\d{9}$", tos)
         if tos == "":
             self.LB_note.setText("请填写手机号")
         elif ret:
-            self.send_industry_sms(tos,smsContent)
+            # 发送短信
+            # self.send_industry_sms(tos, smsContent)
+            # 设置倒计时
+            self.count=0
+            self.timer1.timeout.connect(self.count_time)
+            self.timer1.start(1000)
         else:
             self.LB_note.setText("请填写符合规范的手机号")
+
+    def count_time(self):
+        self.PB_vcode.setEnabled(False)
+        self.count=self.count+1
+        self.PB_vcode.setText("%d秒后重新发送"%(60-self.count))
+        if self.count == 60:
+            self.timer1.stop()
+            self.PB_vcode.setEnabled(True)
+            self.PB_vcode.setText("发送验证码")
 
 
     def send_industry_sms(self,tos, smsContent):
@@ -192,6 +206,7 @@ class SignupLogic(QDialog,Ui_Dialog):
         # 打印完整的返回数据，测试使用 #
         # print(jsondata)
 
+
     def return_main(self):
         """
         返回登录的界面
@@ -200,6 +215,8 @@ class SignupLogic(QDialog,Ui_Dialog):
         from my_login_py import LoginLogic
         Log =LoginLogic()
         Log.show()
+        if self.timer.isActive():
+            self.timer.stop()
         self.close()
 
 
@@ -207,7 +224,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     ui = SignupLogic()
     """qss初始化"""
-    f = open(r'E:/Users/lenovo/PycharmProjects/Jarvis/style_syy.qss', "r", encoding='utf-8')
+    f = open(r'./style_syy.qss', "r", encoding='utf-8')
     style = f.read()
     app.setStyleSheet(style)
     ui.show()

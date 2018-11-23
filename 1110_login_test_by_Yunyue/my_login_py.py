@@ -74,6 +74,11 @@ class LoginLogic(QDialog, Ui_Dialog):
             if password != None:
                 if db_IF.hash(user_password) == password:
                     self.LB_note.setText("登录成功")
+                    timer=QtCore.QTimer(self)
+                    timer.timeout.connect(self.close)
+                    timer.start(3000)
+
+
                 else:
                     self.LB_note.setText("密码不正确")
             else:

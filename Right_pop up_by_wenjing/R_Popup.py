@@ -17,18 +17,18 @@ class FirstWindow(QWidget):
         self.button = QToolButton(self)
         self.button.setText("弹窗")
 
-
     def closeEvent(self, event):
         self.close_signal.emit()
         self.close()
 
 #右侧弹窗
-class RightWindow(QWidget):
+class R_Popup(QWidget):
     def __init__(self, parent=None):
-        super(RightWindow, self).__init__(parent)
+        super(R_Popup, self).__init__(parent)
         # 隐藏任务栏|去掉边框|顶层显示
         self.setWindowFlags(Qt.Tool | Qt.X11BypassWindowManagerHint | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        self.resize(500, 600)
+        self.resize(200, 600)
+        #设置背景色便于区分
         self.setStyleSheet("background: black")
         #控制与主窗口大小和位置的一致
         self.tmpHwnd = None
@@ -38,42 +38,23 @@ class RightWindow(QWidget):
 
     #控制弹窗与主窗口的相对位置和大小
     def checkWindow(self):
-        if ex.isMinimized():
+        if ex.isMinimized():#最小化时
             self.hide()
-        if not ex.isVisible():
+        if not ex.isVisible():#主窗口关闭时
             self.close()
         if not self.isVisible():
             return
         else:
             #固定弹窗与主界面的相对位置
-            #print(ex.geometry().x(),ex.geometry().y())
             self.move(ex.geometry().x()+ex.geometry().width()-self.geometry().width(), ex.geometry().y())
             #固定弹窗与主界面的相对大小
-            #print(ex.geometry().width(),ex.geometry().height())
             self.resize(200,ex.geometry().height())
 
-    #入场动画
-    def doAnim(self):
-        self.animation = QPropertyAnimation(self, b'geometry')
-        self.animation.setDuration(100)
-        self.animation.setStartValue(QRect(ex.geometry().x()+ex.geometry().width(), ex.geometry().y(), 0, ex.geometry().height()))
-        self.animation.setEndValue(QRect(ex.geometry().x()+ex.geometry().width()-200, ex.geometry().y(), 200, ex.geometry().height()))
-        self.animation.start()
-
-    #退场动画
-    def doAnim2(self):
-        self.animation = QPropertyAnimation(self, b'geometry')
-        self.animation.setDuration(300)
-        self.animation.setEndValue(QRect(ex.geometry().x() + ex.geometry().width(), ex.geometry().y(), 0, ex.geometry().height()))
-        self.animation.setStartValue(QRect(ex.geometry().x() + ex.geometry().width(), ex.geometry().y(), 0, ex.geometry().height()))
-        self.animation.start()
-
+    #控制弹窗的显示和隐藏
     def handle_click(self):
         if not self.isVisible():
             self.show()
-            #self.doAnim()
         else:
-            #self.doAnim2()
             self.hide()
 
     def handle_close(self):
@@ -82,7 +63,7 @@ class RightWindow(QWidget):
 if __name__ == "__main__":
     App = QApplication(sys.argv)
     ex = FirstWindow()
-    s = RightWindow()
+    s = R_Popup()
     ex.button.clicked.connect(s.handle_click)
     #ex.btn.clicked.connect(ex.hide)
     ex.close_signal.connect(ex.close)

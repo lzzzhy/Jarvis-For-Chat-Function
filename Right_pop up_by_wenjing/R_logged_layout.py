@@ -6,14 +6,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 #主窗口
-class FirstWindow(QWidget):
+class R_logged_layout(QWidget):
 
     close_signal = pyqtSignal()
     def __init__(self, parent=None):
-        super(FirstWindow, self).__init__(parent)
+        super(R_logged_layout, self).__init__(parent)
         self.resize(250, 600)
         # 设置主窗体标签
-        self.setWindowTitle("主窗口")
+        self.setWindowTitle("右侧已登录弹窗")
 
         #嵌套布局
         self.rp_QFormLayout = QFormLayout(self)
@@ -63,7 +63,7 @@ class FirstWindow(QWidget):
 
 if __name__ == "__main__":
     App = QApplication(sys.argv)
-    ex = FirstWindow()
+    ex = R_logged_layout()
     ex.close_signal.connect(ex.close)
     ex.show()
     sys.exit(App.exec_())

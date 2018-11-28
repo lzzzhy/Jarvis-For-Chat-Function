@@ -9,15 +9,15 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QLabel
 
 
-class FirstWindow(QWidget):
+class R_signin_layout(QWidget):
 
     zhanghao_lable: QLabel
     close_signal = pyqtSignal()
     def __init__(self, parent=None):
-        super(FirstWindow, self).__init__(parent)
+        super(R_signin_layout, self).__init__(parent)
         self.resize(250, 600)
         # 设置主窗体标签
-        self.setWindowTitle("主窗口")
+        self.setWindowTitle("右侧登录弹窗")
 
         self.rp_verticalLayout = QVBoxLayout(self)
         #设置布局的与主界面的边距
@@ -56,7 +56,7 @@ class FirstWindow(QWidget):
 
 if __name__ == "__main__":
     App = QApplication(sys.argv)
-    ex = FirstWindow()
+    ex = R_signin_layout()
     ex.close_signal.connect(ex.close)
     ex.show()
     sys.exit(App.exec_())
